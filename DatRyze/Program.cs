@@ -4,7 +4,19 @@
  * Time: 5:33 PM
  */
  
-//TODO: Fix Lane Clear farming with Spells 
+//TODO: Add Auto-W if Tower aggros enemy
+
+/*
+ Features:
+ -Full combo with togglable QWER
+ -Slider to adjust health to Ulti at
+ -Seraph activator at slider adjustable health
+ -Lane clear with togglable QE with Mana Manager
+ -Last hit with togglable QE (if out of AA range) with Mana Manager
+ -Mixed mode (harass/last hit) with togglable QE with Mana Manager
+ -Drawing Q+WE+AA ranges
+ 
+ */
 
 using System;
 using System.Linq;
@@ -16,6 +28,7 @@ namespace DatRyze {
 	class Program {
 		
 		static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
+		
 		static Orbwalking.Orbwalker Orbwalker;
 		static Spell Q, W, E, R;
 		static Items.Item Seraph;
@@ -31,15 +44,15 @@ namespace DatRyze {
 			Q = new Spell(SpellSlot.Q, 625);
 			W = new Spell(SpellSlot.W, 600);
 			E = new Spell(SpellSlot.E, 600);
-			R = new Spell(SpellSlot.R, 600);
+			R = new Spell(SpellSlot.R);
 			Seraph = new Items.Item(3040, 550);
 			
-			Menu = new Menu("Dat Ryze Menu", Player.ChampionName, true);
+			Menu = new Menu("Dat Ryze", Player.ChampionName, true);
 			
-			Menu orbwalkerMenu = Menu.AddSubMenu(new Menu("DatRyze Orbwalker", "Orbwalker"));
+			Menu orbwalkerMenu = Menu.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
 			Orbwalker = new Orbwalking.Orbwalker(orbwalkerMenu);
 			
-			Menu tsMenu = Menu.AddSubMenu(new Menu("DatRyze TS", "Target Selector"));
+			Menu tsMenu = Menu.AddSubMenu(new Menu("TS", "Target Selector"));
 			TargetSelector.AddToMenu(tsMenu);
 			
 			Menu comboMenu = Menu.AddSubMenu(new Menu("Combo Spells", "comboSpells"));
@@ -47,6 +60,7 @@ namespace DatRyze {
 			comboMenu.AddItem(new MenuItem("comboUseW", "Use W").SetValue(true));
 			comboMenu.AddItem(new MenuItem("comboUseE", "Use E").SetValue(true));
 			comboMenu.AddItem(new MenuItem("comboUseR", "Use R").SetValue(true));
+			comboMenu.AddItem(new MenuItem("comboSliderR", "Use R at Health (%)").SetValue(new Slider(80, 1, 100)));
 			
 			Menu laneClearMenu = Menu.AddSubMenu(new Menu("Lane Clear Spells", "laneClearSpells"));
 			laneClearMenu.AddItem(new MenuItem("laneClearUseQ", "Use Q").SetValue(true));
@@ -87,14 +101,18 @@ namespace DatRyze {
 				return;
 			Checks();
 			float manaPercentage = (Player.Mana / Player.MaxMana) * 100;
+			float healthPercentage = (Player.Health / Player.MaxHealth) * 100;
 			switch (Orbwalker.ActiveMode) {
 				case Orbwalking.OrbwalkingMode.Combo:
+					int comboRHealth = Menu.Item("comboSliderR").GetValue<Slider>().Value;
 					if (Menu.Item("comboUseQ").GetValue<bool>())
 						useQ(false, false);
 					if (Menu.Item("comboUseW").GetValue<bool>())
 						useW();
 					if (Menu.Item("comboUseE").GetValue<bool>())
 						useE(false, false);
+					if (Menu.Item("comboUseR").GetValue<bool>() && R.IsReady() && healthPercentage < comboRHealth)
+						R.Cast();					
 					break;
 				case Orbwalking.OrbwalkingMode.LaneClear:
 					int laneClearMana = Menu.Item("laneClearManaManager").GetValue<Slider>().Value;
