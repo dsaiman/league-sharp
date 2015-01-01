@@ -141,11 +141,11 @@ namespace DatRyze {
 		}
 		
 		static void Drawing_OnDraw(EventArgs args) {
-			if (Menu.Item("drawAA").GetValue<bool>)
+			if (Menu.Item("drawAA").GetValue<bool>())
 				Utility.DrawCircle(Player.Position, 550, Color.Blue);
-			if (Menu.Item("drawQ").GetValue<bool>)
+			if (Menu.Item("drawQ").GetValue<bool>())
 				Utility.DrawCircle(Player.Position, 625, Color.Orange);
-			if (Menu.Item("drawWE").GetValue<bool>)
+			if (Menu.Item("drawWE").GetValue<bool>())
 				Utility.DrawCircle(Player.Position, 600, Color.LimeGreen);
 		}
 		
