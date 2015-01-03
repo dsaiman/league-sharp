@@ -3,8 +3,6 @@
  * Date: 29/12/2014
  * Time: 5:33 PM
  */
- 
-//TODO: Add Auto-W if Tower aggros enemy
 
 /*
  Features:
@@ -16,7 +14,7 @@
  -Mixed mode (harass/last hit) with togglable QE with Mana Manager
  -Drawing Q+WE+AA ranges
  -Auto pot at adjustable health/mana
- -Auto cage under tower when possible
+ -Auto cage under tower when possible (optional)
  
  */
 
@@ -64,12 +62,14 @@ namespace DatRyze {
 			
 			Menu spellsMenu = Menu.AddSubMenu(new Menu("Spells", "spellsMenu"));
 			
+			spellsMenu.AddItem(new MenuItem("towerW", "Auto W if Ally Tower Aggro").SetValue(true));
+			
 			Menu comboMenu = spellsMenu.AddSubMenu(new Menu("Combo Spells", "comboSpells"));
 			comboMenu.AddItem(new MenuItem("comboUseQ", "Use Q").SetValue(true));
 			comboMenu.AddItem(new MenuItem("comboUseW", "Use W").SetValue(true));
 			comboMenu.AddItem(new MenuItem("comboUseE", "Use E").SetValue(true));
 			comboMenu.AddItem(new MenuItem("comboUseR", "Use R").SetValue(true));
-			comboMenu.AddItem(new MenuItem("comboSliderR", "Use R at Health (%)").SetValue(new Slider(80, 1, 100)));
+			comboMenu.AddItem(new MenuItem("comboSliderR", "Use R at Health (%)").SetValue(new Slider(100, 1, 100)));
 			
 			Menu laneClearMenu = spellsMenu.AddSubMenu(new Menu("Lane Clear Spells", "laneClearSpells"));
 			laneClearMenu.AddItem(new MenuItem("laneClearUseQ", "Use Q").SetValue(true));
@@ -223,11 +223,11 @@ namespace DatRyze {
 		
 		//Credits to FluxySenpai
 		static void Game_OnGameProcessPacket(GamePacketEventArgs args) {
-			if (args.PacketData[0] == Packet.S2C.TowerAggro.Header) {
+			if (args.PacketData[0] == Packet.S2C.TowerAggro.Header && Menu.Item("towerW").GetValue<bool>()) {
 				var p = Packet.S2C.TowerAggro.Decoded(args.PacketData);
 				var target = ObjectManager.GetUnitByNetworkId<Obj_AI_Hero>(p.TargetNetworkId);
 				if (target != null && target.IsValidTarget() && Player.Distance(target) <= W.Range) {
-					Game.PrintChat("Target Found Under Tower, Auto Caging");
+					//Game.PrintChat("Target Found Under Tower, Auto Caging");
 					W.CastOnUnit(target);
 				}
 			}
