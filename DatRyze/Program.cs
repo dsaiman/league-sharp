@@ -226,9 +226,9 @@ namespace DatRyze {
 			if (args.PacketData[0] == Packet.S2C.TowerAggro.Header) {
 				var p = Packet.S2C.TowerAggro.Decoded(args.PacketData);
 				var target = ObjectManager.GetUnitByNetworkId<Obj_AI_Hero>(p.TargetNetworkId);
-				if (target.IsEnemy && target.Position.Distance(ObjectManager.Player.Position) <= W.Range) {
+				if (target != null && target.IsValidTarget() && Player.Distance(target) <= W.Range) {
 					Game.PrintChat("Target Found Under Tower, Auto Caging");
-					useW(target);
+					W.CastOnUnit(target);
 				}
 			}
 		}
