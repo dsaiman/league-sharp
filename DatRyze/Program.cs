@@ -16,7 +16,7 @@
  -Mixed mode (harass/last hit) with togglable QE with Mana Manager
  -Drawing Q+WE+AA ranges
  -Auto pot at adjustable health/mana
- -Auto ignite if killable
+ -Auto cage under tower when possible
  
  */
 
@@ -25,6 +25,7 @@ using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
+using Color = System.Drawing.Color;
 
 namespace DatRyze {
 	class Program {
@@ -37,7 +38,6 @@ namespace DatRyze {
 		static Items.Item HealthPot;
 		static Items.Item ManaPot;
 		static Menu Menu;
-		static SpellSlot IgniteSlot;
 		
 		public static void Main(string[] args) {
 			CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
@@ -53,7 +53,6 @@ namespace DatRyze {
 			Seraph = new Items.Item(3040, 0);
 			HealthPot = new Items.Item(2003, 0);
 			ManaPot = new Items.Item(2004, 0);
-			IgniteSlot = Player.GetSpellSlot("summonerdot");
 			
 			Menu = new Menu("Dat Ryze", Player.ChampionName, true);
 			
@@ -72,26 +71,24 @@ namespace DatRyze {
 			comboMenu.AddItem(new MenuItem("comboUseR", "Use R").SetValue(true));
 			comboMenu.AddItem(new MenuItem("comboSliderR", "Use R at Health (%)").SetValue(new Slider(80, 1, 100)));
 			
-			Menu laneClearMenu = Menu.AddSubMenu(new Menu("Lane Clear Spells", "laneClearSpells"));
+			Menu laneClearMenu = spellsMenu.AddSubMenu(new Menu("Lane Clear Spells", "laneClearSpells"));
 			laneClearMenu.AddItem(new MenuItem("laneClearUseQ", "Use Q").SetValue(true));
 			laneClearMenu.AddItem(new MenuItem("laneClearUseE", "Use E").SetValue(true));
 			laneClearMenu.AddItem(new MenuItem("laneClearManaManager", "Mana Manager (%)").SetValue(new Slider(40, 1, 100)));
 			
-			Menu lastHitMenu = Menu.AddSubMenu(new Menu("Last Hit Spells", "lastHitSpells"));
+			Menu lastHitMenu = spellsMenu.AddSubMenu(new Menu("Last Hit Spells", "lastHitSpells"));
 			lastHitMenu.AddItem(new MenuItem("lastHitUseQ", "Use Q").SetValue(false));
 			lastHitMenu.AddItem(new MenuItem("lastHitUseE", "Use E").SetValue(false));
 			lastHitMenu.AddItem(new MenuItem("lastHitManaManager", "Mana Manager (%)").SetValue(new Slider(40, 1, 100)));
 			
-			Menu mixedMenu = Menu.AddSubMenu(new Menu("Mixed Mode Spells", "mixedSpells"));
+			Menu mixedMenu = spellsMenu.AddSubMenu(new Menu("Mixed Mode Spells", "mixedSpells"));
 			mixedMenu.AddItem(new MenuItem("mixedUseQ", "Use Q").SetValue(true));
 			mixedMenu.AddItem(new MenuItem("mixedUseE", "Use E").SetValue(true));
 			mixedMenu.AddItem(new MenuItem("mixedManaManager", "Mana Manager (%)").SetValue(new Slider(40, 1, 100)));
-			
-			spellsMenu.AddItem(new MenuItem("useIgnite", "Auto Ignite"));
-			
+						
 			Menu itemsMenu = Menu.AddSubMenu(new Menu("Items", "items"));
 			itemsMenu.AddItem(new MenuItem("useSeraphs", "Use Seraph's Active").SetValue(true));
-			itemsMenu.AddItem(new MenuItem("seraphHealth", "Activate at Health (%)").SetValue(new Slider(20, 1, 100)));
+			itemsMenu.AddItem(new MenuItem("seraphHealth", "Activate at Health (%)").SetValue(new Slider(25, 1, 100)));
 			itemsMenu.AddItem(new MenuItem("useHealthPot", "Use Health Potion").SetValue(true));
 			itemsMenu.AddItem(new MenuItem("healthPotHealth", "Activate at Health (%)").SetValue(new Slider(30, 1, 100)));
 			itemsMenu.AddItem(new MenuItem("useManaPot", "Use Mana Potion").SetValue(true));
@@ -105,6 +102,7 @@ namespace DatRyze {
 			Menu.AddToMainMenu();
 			Drawing.OnDraw += Drawing_OnDraw;
 			Game.OnGameUpdate += Game_OnGameUpdate;
+			Game.OnGameProcessPacket += Game_OnGameProcessPacket;
 			Game.PrintChat("<font color ='#33FFFF'>Dat Ryze</font> by GoldenGates loaded. Enjoy!");
 		}
 		
@@ -125,7 +123,6 @@ namespace DatRyze {
 						useE(false, false);
 					if (Menu.Item("comboUseR").GetValue<bool>() && R.IsReady() && healthPercentage < comboRHealth)
 						R.Cast();		
-					Ignite();
 					break;
 				case Orbwalking.OrbwalkingMode.LaneClear:
 					int laneClearMana = Menu.Item("laneClearManaManager").GetValue<Slider>().Value;
@@ -155,36 +152,24 @@ namespace DatRyze {
 		
 		static void Drawing_OnDraw(EventArgs args) {
 			if (Menu.Item("drawAA").GetValue<bool>())
-				Utility.DrawCircle(Player.Position, 550, System.Drawing.Color.Blue);
+				Utility.DrawCircle(Player.Position, 550, Color.Blue);
 			if (Menu.Item("drawQ").GetValue<bool>())
-				Utility.DrawCircle(Player.Position, 625, System.Drawing.Color.Orange);
+				Utility.DrawCircle(Player.Position, 625, Color.Orange);
 			if (Menu.Item("drawWE").GetValue<bool>())
-				Utility.DrawCircle(Player.Position, 600, System.Drawing.Color.Orange);
+				Utility.DrawCircle(Player.Position, 600, Color.HotPink);
 		}
 		
 		static void Checks() {
 			float healthPercentage = (Player.Health / Player.MaxHealth) * 100;
 			float manaPercentage = (Player.Mana / Player.MaxMana) * 100;
-			if (Menu.Item("useSeraphs").GetValue<bool>() && Items.HasItem(Seraph.Id) && Seraph.IsReady() && healthPercentage < Menu.Item("seraphHealth").GetValue<Slider>().Value && Player.CountEnemysInRange(600) > 0) {
-				Seraph.Cast();
-			}
+			if (Menu.Item("useSeraphs").GetValue<bool>() && Items.HasItem(Seraph.Id) && Seraph.IsReady() && !InFountain() && healthPercentage < Menu.Item("seraphHealth").GetValue<Slider>().Value && Player.CountEnemysInRange(600) > 0)
+				Seraph.Cast();			
 			if (Menu.Item("useHealthPot").GetValue<bool>() && Items.HasItem(HealthPot.Id) && HealthPot.IsReady() && !InFountain() && !Player.HasBuff("RegenerationPotion", true) && healthPercentage < Menu.Item("healthPotHealth").GetValue<Slider>().Value)
 				HealthPot.Cast();
-			if (Menu.Item("useManaPot").GetValue<bool>() && Items.HasItem(ManaPot.Id) && ManaPot.IsReady() && !InFountain()) {
-				if (manaPercentage < Menu.Item("manaPotMana").GetValue<Slider>().Value)
-					ManaPot.Cast();			
-			}
+			if (Menu.Item("useManaPot").GetValue<bool>() && Items.HasItem(ManaPot.Id) && ManaPot.IsReady() && !InFountain() && manaPercentage < Menu.Item("manaPotMana").GetValue<Slider>().Value)
+				ManaPot.Cast();					
 		}
-		
-		static void Ignite() {
-			Obj_AI_Hero target = TargetSelector.GetTarget(600, TargetSelector.DamageType.Magical);
-			double igniteDmg = Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
-			if (target != null && Menu.Item("useIgnite").GetValue<bool>() && IgniteSlot != SpellSlot.Unknown &&
-			    Player.Spellbook.CanUseSpell(IgniteSlot) == SpellState.Ready)
-			if (igniteDmg > target.Health)
-				Player.Spellbook.CastSpell(IgniteSlot, target);
-		}
-		
+				
 		static void useQ(bool onMinion, bool laneClear) {
 			if (!Q.IsReady())
 				return;
@@ -234,6 +219,18 @@ namespace DatRyze {
 			return ObjectManager.Get<Obj_SpawnPoint>()
                     .Where(spawnPoint => spawnPoint.IsAlly)
                     .Any(spawnPoint => Vector2.Distance(ObjectManager.Player.Position.To2D(), spawnPoint.Position.To2D()) < fountainRange);
+		}
+		
+		//Credits to FluxySenpai
+		static void Game_OnGameProcessPacket(GamePacketEventArgs args) {
+			if (args.PacketData[0] == Packet.S2C.TowerAggro.Header) {
+				var p = Packet.S2C.TowerAggro.Decoded(args.PacketData);
+				var target = ObjectManager.GetUnitByNetworkId<Obj_AI_Hero>(p.TargetNetworkId);
+				if (target.IsEnemy && target.Position.Distance(ObjectManager.Player.Position) <= W.Range) {
+					Game.PrintChat("Target Found Under Tower, Auto Caging");
+					useW(target);
+				}
+			}
 		}
 	}
 }
