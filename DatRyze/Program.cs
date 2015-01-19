@@ -102,7 +102,7 @@ namespace DatRyze {
 			Menu.AddToMainMenu();
 			Drawing.OnDraw += Drawing_OnDraw;
 			Game.OnGameUpdate += Game_OnGameUpdate;
-			Game.OnGameProcessPacket += Game_OnGameProcessPacket;
+			//Game.OnGameProcessPacket += Game_OnGameProcessPacket;
 			Game.PrintChat("<font color ='#33FFFF'>Dat Ryze</font> by GoldenGates loaded. Enjoy!");
 		}
 		
@@ -152,21 +152,21 @@ namespace DatRyze {
 		
 		static void Drawing_OnDraw(EventArgs args) {
 			if (Menu.Item("drawAA").GetValue<bool>())
-				Utility.DrawCircle(Player.Position, 550, Color.Blue);
+				Render.Circle.DrawCircle(Player.Position, 550, Color.Blue);
 			if (Menu.Item("drawQ").GetValue<bool>())
-				Utility.DrawCircle(Player.Position, 625, Color.Orange);
+				Render.Circle.DrawCircle(Player.Position, 625, Color.Orange);
 			if (Menu.Item("drawWE").GetValue<bool>())
-				Utility.DrawCircle(Player.Position, 600, Color.HotPink);
+				Render.Circle.DrawCircle(Player.Position, 600, Color.HotPink);
 		}
 		
 		static void Checks() {
 			float healthPercentage = (Player.Health / Player.MaxHealth) * 100;
 			float manaPercentage = (Player.Mana / Player.MaxMana) * 100;
-			if (Menu.Item("useSeraphs").GetValue<bool>() && Items.HasItem(Seraph.Id) && Seraph.IsReady() && !InFountain() && healthPercentage < Menu.Item("seraphHealth").GetValue<Slider>().Value && Player.CountEnemysInRange(600) > 0)
+			if (Menu.Item("useSeraphs").GetValue<bool>() && Items.HasItem(Seraph.Id) && Seraph.IsReady() && !Player.InFountain() && healthPercentage < Menu.Item("seraphHealth").GetValue<Slider>().Value && Player.CountEnemiesInRange(600) > 0)
 				Seraph.Cast();			
-			if (Menu.Item("useHealthPot").GetValue<bool>() && Items.HasItem(HealthPot.Id) && HealthPot.IsReady() && !InFountain() && !Player.HasBuff("RegenerationPotion", true) && healthPercentage < Menu.Item("healthPotHealth").GetValue<Slider>().Value)
+			if (Menu.Item("useHealthPot").GetValue<bool>() && Items.HasItem(HealthPot.Id) && HealthPot.IsReady() && !Player.InFountain() && !Player.HasBuff("RegenerationPotion", true) && healthPercentage < Menu.Item("healthPotHealth").GetValue<Slider>().Value)
 				HealthPot.Cast();
-			if (Menu.Item("useManaPot").GetValue<bool>() && Items.HasItem(ManaPot.Id) && ManaPot.IsReady() && !InFountain() && manaPercentage < Menu.Item("manaPotMana").GetValue<Slider>().Value)
+			if (Menu.Item("useManaPot").GetValue<bool>() && Items.HasItem(ManaPot.Id) && ManaPot.IsReady() && !Player.InFountain() && manaPercentage < Menu.Item("manaPotMana").GetValue<Slider>().Value)
 				ManaPot.Cast();					
 		}
 				
@@ -211,19 +211,10 @@ namespace DatRyze {
 			}
 		}
 		
-		//Credits to sebastiank1
-		static bool InFountain() {
-			float fountainRange = 750;
-			if (Utility.Map.GetMap()._MapType == Utility.Map.MapType.SummonersRift)
-				fountainRange = 1050;
-			return ObjectManager.Get<Obj_SpawnPoint>()
-                    .Where(spawnPoint => spawnPoint.IsAlly)
-                    .Any(spawnPoint => Vector2.Distance(ObjectManager.Player.Position.To2D(), spawnPoint.Position.To2D()) < fountainRange);
-		}
 		
 		//Credits to FluxySenpai
-		static void Game_OnGameProcessPacket(GamePacketEventArgs args) {
-			if (args.PacketData[0] == Packet.S2C.TowerAggro.Header && Menu.Item("towerW").GetValue<bool>()) {
+	/*	static void Game_OnGameProcessPacket(GamePacketEventArgs args) {
+			if (args.PacketData[0] == Network.Packets.S2C.TowerAggro.Header && Menu.Item("towerW").GetValue<bool>()) {
 				var p = Packet.S2C.TowerAggro.Decoded(args.PacketData);
 				var target = ObjectManager.GetUnitByNetworkId<Obj_AI_Hero>(p.TargetNetworkId);
 				if (target != null && target.IsValidTarget() && Player.Distance(target) <= W.Range) {
@@ -231,8 +222,8 @@ namespace DatRyze {
 					W.CastOnUnit(target);
 				}
 			}
-		}
-	}
+		}*/
+	} 
 }
 
 //http://pastie.org/9804616
