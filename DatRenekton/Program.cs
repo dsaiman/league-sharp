@@ -116,11 +116,11 @@ namespace DatRenekton {
 		static void Orbwalking_BeforeAttack(Orbwalking.BeforeAttackEventArgs args) {
 			if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo || Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed) {
 				Obj_AI_Hero target = TargetSelector.GetTarget(Player.AttackRange, TargetSelector.DamageType.Physical);
-				if (Menu.Item("comboUseW").GetValue<bool>() && W.IsReady())
+				if (Menu.Item("comboUseW").GetValue<bool>() && W.IsReady() && args.Target == target)
 					W.Cast();
-				if (Tiamat.IsOwned() && Tiamat.IsInRange(target) && Tiamat.IsReady())
+				if (Tiamat.IsOwned() && Tiamat.IsInRange(target) && Tiamat.IsReady() && args.Target == target)
 					Tiamat.Cast();
-				if (Hydra.IsOwned() && Hydra.IsInRange(target) && Hydra.IsReady())
+				if (Hydra.IsOwned() && Hydra.IsInRange(target) && Hydra.IsReady() && args.Target == target)
 					Hydra.Cast();
 			}
 		}
