@@ -8,12 +8,13 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>DatRenekton</RootNamespace>
     <AssemblyName>DatRenekton</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <PreBuildEvent />
     <PostBuildEvent />
     <PlatformTarget>x86</PlatformTarget>
     <OutputPath>bin\Release</OutputPath>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
