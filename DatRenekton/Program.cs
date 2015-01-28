@@ -106,7 +106,7 @@ namespace DatRenekton {
 		static void Drawing_OnDraw(EventArgs args) {
 			if (Menu.Item("drawQ").GetValue<bool>())
 				
-				Render.Circle.DrawCircle(Player.Position, Player.BoundingRadius, Color.Orange);
+				Render.Circle.DrawCircle(Player.Position, Player.BoundingRadius + 225, Color.Orange);
 			if (Menu.Item("drawIt").GetValue<bool>()) {
 				Render.Circle.DrawCircle(new Vector3(Player.Position.X - 125, Player.Position.Y, Player.Position.Z), 100, Color.Red);
 				Render.Circle.DrawCircle(new Vector3(Player.Position.X + 75, Player.Position.Y, Player.Position.Z), 100, Color.Red);
