@@ -68,7 +68,7 @@ namespace DatRenekton {
 			
 			Menu.AddToMainMenu();
 			Drawing.OnDraw += Drawing_OnDraw;
-			Orbwalking.BeforeAttack += Orbwalking_BeforeAttack;
+			Orbwalking.AfterAttack += Orbwalking_AfterAttack;
 			Game.OnGameUpdate += Game_OnGameUpdate;
 			Game.PrintChat("<font color ='#33FFFF'>Dat Renekton</font> by GoldenGates loaded, enjoy! Best used with an activator and evader!");
 		}
@@ -113,14 +113,13 @@ namespace DatRenekton {
 			}
 		}
 		
-		static void Orbwalking_BeforeAttack(Orbwalking.BeforeAttackEventArgs args) {
-			if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo || Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed) {
-				Obj_AI_Hero target = TargetSelector.GetTarget(Player.AttackRange, TargetSelector.DamageType.Physical);
-				if (Menu.Item("comboUseW").GetValue<bool>() && W.IsReady() && args.Target == target)
+		static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target) {
+			if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo) {
+				if (Menu.Item("comboUseW").GetValue<bool>() && W.IsReady() && target.IsEnemy)
 					W.Cast();
-				if (Tiamat.IsOwned() && Tiamat.IsInRange(target) && Tiamat.IsReady() && args.Target == target)
+				if (Tiamat.IsOwned() && Player.Distance(target) < Tiamat.Range && Tiamat.IsReady())
 					Tiamat.Cast();
-				if (Hydra.IsOwned() && Hydra.IsInRange(target) && Hydra.IsReady() && args.Target == target)
+				if (Hydra.IsOwned() && Player.Distance(target) < Hydra.Range && Hydra.IsReady())
 					Hydra.Cast();
 			}
 		}
