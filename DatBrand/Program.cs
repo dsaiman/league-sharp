@@ -54,7 +54,7 @@ namespace DatBrand {
 					break;
 				case Orbwalking.OrbwalkingMode.Mixed:
 					if (player.ManaPercentage() > menu.Item("harassManaManager").GetValue<Slider>().Value) {
-						DoHarass(menu.Item("harassUseQ").GetValue<bool>(), menu.Item("harasUseW").GetValue<bool>(), menu.Item("harasUseE").GetValue<bool>());
+						DoHarass(menu.Item("harassUseQ").GetValue<bool>(), menu.Item("harassUseW").GetValue<bool>(), menu.Item("harassUseE").GetValue<bool>());
 					}
 					break;
 				case Orbwalking.OrbwalkingMode.LaneClear:
@@ -96,7 +96,7 @@ namespace DatBrand {
 		}
 		
 		static void DoHarass(bool useQ, bool useW, bool useE) {
-			Obj_AI_Hero target = TargetSelector.GetTarget(q.Range - 100, TargetSelector.DamageType.Magical);
+			Obj_AI_Hero target = TargetSelector.GetTarget(w.Range - 50, TargetSelector.DamageType.Magical);
 			if (target != null && target.IsValidTarget()) {
 				if (player.Distance(target) < e.Range) {
 					if (e.IsReady() && useE)
@@ -108,7 +108,7 @@ namespace DatBrand {
 				} else {
 					if (w.IsReady() && useW)
 						w.CastIfHitchanceEquals(target, HitChance.High, true);
-					if (q.IsReady() && IsAblazed(target) && useQ)
+					if (q.IsReady() && useQ)
 						q.CastIfHitchanceEquals(target, HitChance.High, true);
 					if (e.IsReady() && useE)
 						e.Cast(target, true);
