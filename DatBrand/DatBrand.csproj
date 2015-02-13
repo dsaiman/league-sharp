@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>DatBrand</RootNamespace>
     <AssemblyName>DatBrand</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <PreBuildEvent />
     <PostBuildEvent />
@@ -42,7 +42,7 @@
       <HintPath>C:\sources\winx64\etwproviders\LeagueSharp\\System\LeagueSharp.Common.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+      <RequiredTargetFramework>4.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="SharpDX">
       <HintPath>C:\sources\winx64\etwproviders\LeagueSharp\\System\SharpDX.dll</HintPath>
