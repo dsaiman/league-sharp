@@ -40,17 +40,17 @@ namespace Pentakill_Cassiopeia
             if (Program.menuController.getMenu().Item("comboUseR").GetValue<bool>())
             {
                 List<Obj_AI_Hero> targets;
-                if (Program.menuController.getMenu().Item("faceOnlyR").GetValue<bool>())
-                {
-                    //Gets all facing enemies who can get hit by R
-                    targets = HeroManager.Enemies.Where(o => Program.r.WillHit(o, target.Position) && o.IsFacing(Program.player)).ToList<Obj_AI_Hero>();
-                }
-                else
-                {
-                    //Gets all enemies who can get hit by R
-                    targets = HeroManager.Enemies.Where(o => Program.r.WillHit(o, target.Position)).ToList<Obj_AI_Hero>();
+                /* if (Program.menuController.getMenu().Item("faceOnlyR").GetValue<bool>())
+                 {
+                     //Gets all facing enemies who can get hit by R
+                     targets = HeroManager.Enemies.Where(o => Program.r.WillHit(o, target.Position) && o.IsFacing(Program.player)).ToList<Obj_AI_Hero>();
+                 }
+                 else
+                 {*/
+                //Gets all enemies who can get hit by R
+                targets = HeroManager.Enemies.Where(o => Program.r.WillHit(o, target.Position) && o.Distance(Program.player.Position) < 700).ToList<Obj_AI_Hero>();
 
-                }
+                // }
                 if (targets.Count >= Program.menuController.getMenu().Item("minEnemies").GetValue<Slider>().Value)
                 {
                     Program.r.Cast(target.Position);
