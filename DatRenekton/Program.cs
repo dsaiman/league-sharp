@@ -69,7 +69,7 @@ namespace DatRenekton {
 			Menu.AddToMainMenu();
 			Drawing.OnDraw += Drawing_OnDraw;
 			Orbwalking.AfterAttack += Orbwalking_AfterAttack;
-			Game.OnGameUpdate += Game_OnGameUpdate;
+			Game.OnUpdate += Game_OnGameUpdate;
 			Game.PrintChat("<font color ='#33FFFF'>Dat Renekton</font> by GoldenGates loaded, enjoy! Best used with an activator and evader!");
 		}
 		

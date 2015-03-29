@@ -135,9 +135,6 @@ namespace Pentakill_Cassiopeia
 
         static void Main(string[] args)
         {
-            //Clears console
-            Console.Clear();
-            Console.WriteLine("Pentakill Cassiopeia Loading...");
             //Subscribes to OnGameLoad method
             CustomEvents.Game.OnGameLoad += OnGameLoad;
         }

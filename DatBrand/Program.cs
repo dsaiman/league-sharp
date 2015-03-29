@@ -40,7 +40,7 @@ namespace DatBrand {
 			InitializeMenu();
 			
 			menu.AddToMainMenu();
-			Game.OnGameUpdate += Game_OnGameUpdate;
+			Game.OnUpdate += Game_OnGameUpdate;
 			Drawing.OnDraw += Draw_OnDraw;
 			Game.PrintChat("<font color ='#33FFFF'>Dat Brand</font> by GoldenGates loaded, enjoy!");
 		}
@@ -69,7 +69,7 @@ namespace DatBrand {
 		static void DoCombo(bool useQ, bool useW, bool useE, bool useR, bool useIgn) {
 			Obj_AI_Hero target = TargetSelector.GetTarget(w.Range - 50, TargetSelector.DamageType.Magical);
 			if (target != null && target.IsValidTarget()) {
-				if (player.Distance(target) < e.Range) {
+				if (player.Distance(target.Position) < e.Range) {
 					if (e.IsReady() && useE)
 						e.Cast(target, true);
 					if (q.IsReady() && IsAblazed(target) && useQ)
@@ -98,7 +98,7 @@ namespace DatBrand {
 		static void DoHarass(bool useQ, bool useW, bool useE) {
 			Obj_AI_Hero target = TargetSelector.GetTarget(w.Range - 50, TargetSelector.DamageType.Magical);
 			if (target != null && target.IsValidTarget()) {
-				if (player.Distance(target) < e.Range) {
+				if (player.Distance(target.Position) < e.Range) {
 					if (e.IsReady() && useE)
 						e.Cast(target, true);
 					if (q.IsReady() && useQ)
@@ -125,7 +125,7 @@ namespace DatBrand {
 			}
 			if (e.IsReady() && useE) {
 				foreach (Obj_AI_Base minion in minions) {
-					if (IsAblazed(minion) && player.Distance(minion) < e.Range) {
+					if (IsAblazed(minion) && player.Distance(minion.Position) < e.Range) {
 						e.Cast(minion);
 						break;
 					}

@@ -101,7 +101,7 @@ namespace DatRyze {
 			
 			Menu.AddToMainMenu();
 			Drawing.OnDraw += Drawing_OnDraw;
-			Game.OnGameUpdate += Game_OnGameUpdate;
+			Game.OnUpdate += Game_OnGameUpdate;
 			//Game.OnGameProcessPacket += Game_OnGameProcessPacket;
 			Game.PrintChat("<font color ='#33FFFF'>Dat Ryze</font> by GoldenGates loaded. Enjoy!");
 		}
