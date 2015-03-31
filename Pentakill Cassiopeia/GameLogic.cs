@@ -11,6 +11,9 @@ namespace Pentakill_Cassiopeia
 {
     class GameLogic
     {
+
+        static int lastECast = 0;
+
         public static void Checks()
         {
             //Updates the auto-leveling sequence each time (redundant)
@@ -48,7 +51,7 @@ namespace Pentakill_Cassiopeia
                  else
                  {*/
                 //Gets all enemies who can get hit by R
-                targets = HeroManager.Enemies.Where(o => Program.r.WillHit(o, target.Position) && o.Distance(Program.player.Position) < 700).ToList<Obj_AI_Hero>();
+                targets = HeroManager.Enemies.Where(o => Program.r.WillHit(o, target.Position) && o.Distance(Program.player.Position) < 500).ToList<Obj_AI_Hero>();
 
                 // }
                 if (targets.Count >= Program.menuController.getMenu().Item("minEnemies").GetValue<Slider>().Value)
@@ -67,11 +70,13 @@ namespace Pentakill_Cassiopeia
             //Casts E if selected in menu and in E range and target is poisoned
             if (Program.menuController.getMenu().Item("comboUseE").GetValue<bool>())
             {
-                if (target != null && target.Distance(Program.player.Position) < Program.e.Range)
+                if (target != null && target.Distance(Program.player.Position) < Program.e.Range && (Environment.TickCount - lastECast) > Program.menuController.getMenu().Item("eDelay").GetValue<Slider>().Value)
                 {
                     if (target.HasBuffOfType(BuffType.Poison))
                     {
                         Program.e.CastOnUnit(target);
+                        lastECast = Environment.TickCount;
+
                     }
                 }
             }
@@ -100,11 +105,12 @@ namespace Pentakill_Cassiopeia
             //Casts E if selected in menu and in E range and target is poisoned
             if (Program.menuController.getMenu().Item("harassUseE").GetValue<bool>())
             {
-                if (target != null && target.Distance(Program.player.Position) < Program.e.Range)
+                if (target != null && target.Distance(Program.player.Position) < Program.e.Range && (Environment.TickCount - lastECast) > Program.menuController.getMenu().Item("eDelay").GetValue<Slider>().Value)
                 {
                     if (target.HasBuffOfType(BuffType.Poison))
                     {
                         Program.e.CastOnUnit(target);
+                        lastECast = Environment.TickCount;
                     }
                 }
             }
@@ -133,12 +139,13 @@ namespace Pentakill_Cassiopeia
             if (Program.menuController.getMenu().Item("lastHitUseE").GetValue<bool>())
             {
                 //Checks if minion will die from E
-                if (minion != null && minion.Health < Program.e.GetDamage(minion))
+                if (minion != null && minion.Health < Program.e.GetDamage(minion) && (Environment.TickCount - lastECast) > Program.menuController.getMenu().Item("eDelay").GetValue<Slider>().Value)
                 {
                     //Is the minion poisoned so E doesn't go on CD?
                     if (minion.HasBuffOfType(BuffType.Poison))
                     {
                         Program.e.CastOnUnit(minion);
+                        lastECast = Environment.TickCount;
                     }
                 }
             }
@@ -169,9 +176,10 @@ namespace Pentakill_Cassiopeia
             {
                 //Gets minion that is poisoned and casts E on it
                 Obj_AI_Base minion = MinionManager.GetMinions(Program.player.Position, Program.e.Range).FirstOrDefault(o => o.HasBuffOfType(BuffType.Poison));
-                if (minion != null)
+                if (minion != null && (Environment.TickCount - lastECast) > Program.menuController.getMenu().Item("eDelay").GetValue<Slider>().Value)
                 {
                     Program.e.CastOnUnit(minion);
+                    lastECast = Environment.TickCount;
                 }
             }
         }

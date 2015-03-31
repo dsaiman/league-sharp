@@ -30,7 +30,7 @@ namespace Pentakill_Cassiopeia.Controller
             comboMenu.AddItem(new MenuItem("comboUseW", "Use W")).SetValue(true);
             comboMenu.AddItem(new MenuItem("comboUseE", "Use E")).SetValue(true);
             comboMenu.AddItem(new MenuItem("comboUseR", "Use R")).SetValue(true);
-         //   comboMenu.AddItem(new MenuItem("faceOnlyR", "Only R If Can Stun")).SetValue(true);
+            //   comboMenu.AddItem(new MenuItem("faceOnlyR", "Only R If Can Stun")).SetValue(true);
             comboMenu.AddItem(new MenuItem("minEnemies", "Minimum Enemies for R").SetValue(new Slider(2, 1, 5)));
             comboMenu.AddItem(new MenuItem("useIgnite", "Smart Ignite").SetValue(true));
         }
@@ -72,6 +72,7 @@ namespace Pentakill_Cassiopeia.Controller
 
         private void Misc()
         {
+            menu.AddItem(new MenuItem("eDelay", "E Cast Delay (ms)")).SetValue(new Slider(75, 1, 1000));
             menu.AddItem(new MenuItem("autoLevel", "Auto Level Spells")).SetValue(true);
         }
 
